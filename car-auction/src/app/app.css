@@ -1,0 +1,12 @@
+.top-menu {
+  padding: 10px;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+}
+
+.main-content {
+  margin-top: 60px;
+  padding: 20px;
+}

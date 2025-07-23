@@ -2,10 +2,12 @@ import { Component, OnInit } from '@angular/core';
 import { Observable } from 'rxjs';
 import { IVehicle } from '../../models/IVehicle';
 import { VehicleService } from '../../services/vehicle-service';
+import { TableModule } from 'primeng/table';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-vehicle-list',
-  imports: [],
+  imports: [TableModule, CommonModule],
   templateUrl: './vehicle-list.html',
   styleUrl: './vehicle-list.css',
 })
@@ -16,6 +18,7 @@ export class VehicleList implements OnInit {
 
   ngOnInit(): void {
     this.vehicles$ = this.vehicleService.vehicles$;
+    console.log(this.vehicles$);
   }
 
   toggleFavourite(id: number) {

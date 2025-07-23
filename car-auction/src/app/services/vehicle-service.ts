@@ -15,13 +15,15 @@ export class VehicleService {
   }
 
   private loadVehiclesFromJson() {
-    this.http.get<IVehicle[]>('assets/vehicles.json').subscribe((data) => {
-      const withIds = data.map((vehicle, index) => ({
-        ...vehicle,
-        id: index + 1,
-      }));
-      this.vehiclesSubject.next(withIds);
-    });
+    this.http
+      .get<IVehicle[]>('assets/vehicles_dataset.json')
+      .subscribe((data) => {
+        const withIds = data.map((vehicle, index) => ({
+          ...vehicle,
+          id: index + 1,
+        }));
+        this.vehiclesSubject.next(withIds);
+      });
   }
 
   toggleFavourite(id: number) {
@@ -32,5 +34,9 @@ export class VehicleService {
         : vehicle
     );
     this.vehiclesSubject.next(updated);
+  }
+
+  getVehicleById(id: number): IVehicle | undefined {
+    return this.vehiclesSubject.getValue().find((v) => v.id === id);
   }
 }
