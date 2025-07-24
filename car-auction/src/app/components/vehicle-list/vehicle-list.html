@@ -1,33 +1,125 @@
 <div *ngIf="vehicles$ | async as vehicles">
-  <p-table [value]="vehicles">
-    <ng-template pTemplate="header">
-      <tr>
-        <th>Make</th>
-        <th>Model</th>
-        <th>Year</th>
-        <th>Mileage</th>
-        <th>Starting Bid</th>
-        <th>Auction</th>
-        <th>Favourite</th>
-      </tr>
+  <p-dataview
+    [value]="vehicles"
+    [rows]="5"
+    [paginator]="true"
+    showCurrentPageReport="true"
+    [rowsPerPageOptions]="rowsOptions"
+    [sortField]="sortField"
+    [sortOrder]="sortOrder"
+  >
+    <ng-template #header>
+      <div class="filters-div">
+        <p-select
+          [showClear]="true"
+          [options]="sortOptions"
+          [(ngModel)]="sortKey"
+          placeholder="Sort By Starting Bid"
+          (onChange)="onSortChange($event)"
+        />
+        <p-select
+          [showClear]="true"
+          [options]="sortOptionsMileage"
+          [(ngModel)]="sortKey"
+          placeholder="Sort By Mileage"
+          (onChange)="onSortChange($event)"
+        />
+        <p-button
+          icon="pi pi-filter"
+          label="Filters"
+          (onClick)="showFilters = true"
+        />
+      </div>
     </ng-template>
-    <ng-template pTemplate="body" let-vehicle>
-      <tr>
-        <td>{{ vehicle.make }}</td>
-        <td>{{ vehicle.model }}</td>
-        <td>{{ vehicle.year }}</td>
-        <td>{{ vehicle.mileage }}</td>
-        <td>{{ vehicle.startingBid }}</td>
-        <td>{{ getTimeUntilAuction(vehicle.auctionDateTime) }}</td>
-        <td>
-          <button
-            pButton
-            icon="pi pi-star"
-            [class.text-yellow-500]="vehicle.favourite"
-            (click)="toggleFavourite(vehicle.id)"
-          ></button>
-        </td>
-      </tr>
+    <ng-template #list let-vehicles>
+      <div class="grid grid-cols-12 gap-4 grid-nogutter">
+        <div *ngFor="let vehicle of vehicles">
+          <div class="vehicle-div">
+            <img class="rounded-image" src="assets/blue_car.jpg" width="200" />
+            <div class="vehicle-information">
+              {{ vehicle.make }}
+              {{ vehicle.model }}
+              <span
+                >Time until Auction Date:
+                {{ getTimeUntilAuction(vehicle.auctionDateTime) }}</span
+              >
+              <span>
+                {{ formatNumberToSpecificLocale(vehicle.mileage) }} Km</span
+              >
+              <span
+                >Starting Bid:
+                {{ formatNumberToSpecificLocale(vehicle.startingBid) }} €</span
+              >
+            </div>
+
+            <div class="buttons-div">
+              <p-button
+                icon="
+                  {{ vehicle.favourite ? 'pi pi-heart-fill' : 'pi pi-heart' }}
+                "
+                (click)="toggleFavourite(vehicle.id)"
+              ></p-button>
+              <p-button icon="pi pi-search-plus" label="More Details" />
+            </div>
+          </div>
+        </div>
+      </div>
     </ng-template>
-  </p-table>
+  </p-dataview>
+  <p-drawer [(visible)]="showFilters" header="Filters">
+    <div class="filters-drawer">
+      <p-multiselect
+        [options]="makeList"
+        [(ngModel)]="selectedMake"
+        placeholder="Select Make"
+        [maxSelectedLabels]="3"
+        (onChange)="onChangeMake()"
+      />
+      <p-multiselect
+        [options]="modelList"
+        [(ngModel)]="selectedModel"
+        placeholder="Select Model"
+        [maxSelectedLabels]="3"
+        [disabled]="!selectedMake || selectedMake.length === 0"
+      />
+      <p-selectbutton
+        [options]="stateOptions"
+        [(ngModel)]="value"
+        optionLabel="label"
+        optionValue="value"
+        aria-labelledby="basic"
+      />
+      <span>Starting Bid Range</span>
+      <p-slider
+        [(ngModel)]="rangeValues"
+        [step]="1000"
+        max="50000"
+        min="5000"
+        [range]="true"
+      />
+
+      <div class="slider-labels">
+        <span>{{ rangeValues[0] }} €</span>
+        <span>{{ rangeValues[1] }} €</span>
+      </div>
+    </div>
+    <ng-template #footer>
+      <div class="buttons-footer">
+        <p-button
+          icon="pi pi-search"
+          label="Show Vehicles"
+          [raised]="true"
+          variant="outlined"
+          size="small"
+        ></p-button>
+        <p-button
+          icon="pi pi-times"
+          label="Clear Filters"
+          severity="secondary"
+          size="small"
+          variant="text"
+        ></p-button>
+      </div>
+    </ng-template>
+  </p-drawer>
 </div>

@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, map, Observable } from 'rxjs';
 import { IVehicle } from '../models/IVehicle';
 import { HttpClient } from '@angular/common/http';
 
@@ -38,5 +38,24 @@ export class VehicleService {
 
   getVehicleById(id: number): IVehicle | undefined {
     return this.vehiclesSubject.getValue().find((v) => v.id === id);
+  }
+
+  getUniqueMakes(): Observable<string[]> {
+    return this.vehicles$.pipe(
+      map((vehicles: any) =>
+        Array.from(new Set(vehicles.map((vehicle: IVehicle) => vehicle.make)))
+      )
+    );
+  }
+
+  getUniqueModels(selectedMakes: string[]): Observable<string[]> {
+    return this.vehicles$.pipe(
+      map((vehicles: IVehicle[]) =>
+        vehicles
+          .filter((vehicle) => selectedMakes.includes(vehicle.make))
+          .map((vehicle) => vehicle.model)
+      ),
+      map((models) => Array.from(new Set(models)))
+    );
   }
 }
