@@ -49,3 +49,11 @@
   flex-direction: row;
   gap: 10px;
 }
+.input-range {
+  width: 40%;
+  margin: 2%;
+  border-radius: 4px;
+  background-color: #09090b;
+  border: 1px solid #52525b;
+  color: white;
+}

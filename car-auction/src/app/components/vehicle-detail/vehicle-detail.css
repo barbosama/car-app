@@ -1,0 +1,20 @@
+.icon-div {
+  display: flex;
+  flex-direction: row;
+  gap: 10%;
+}
+
+.icon-item {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  align-items: center;
+}
+
+.specification-div {
+  display: flex;
+  flex-direction: row;
+  border-bottom: 1px solid grey;
+  width: 30%;
+  justify-content: space-between;
+}

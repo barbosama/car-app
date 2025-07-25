@@ -58,4 +58,33 @@ export class VehicleService {
       map((models) => Array.from(new Set(models)))
     );
   }
+
+  applyFilters(
+    selectedMakes: string[],
+    selectedModels: string[],
+    isFavourite: boolean | null,
+    rangeValues: number[]
+  ): Observable<IVehicle[]> {
+    return this.vehicles$.pipe(
+      map((vehicles) =>
+        vehicles.filter((vehicle) => {
+          const matchesMake =
+            selectedMakes.length === 0 || selectedMakes.includes(vehicle.make);
+
+          const matchesModel =
+            selectedModels.length === 0 ||
+            selectedModels.includes(vehicle.model);
+
+          const matchesFavourite =
+            isFavourite === null || vehicle.favourite === isFavourite;
+
+          const matchesBid =
+            vehicle.startingBid >= rangeValues[0] &&
+            vehicle.startingBid <= rangeValues[1];
+
+          return matchesMake && matchesModel && matchesFavourite && matchesBid;
+        })
+      )
+    );
+  }
 }

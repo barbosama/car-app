@@ -11,17 +11,27 @@
     <ng-template #header>
       <div class="filters-div">
         <p-select
-          [showClear]="true"
           [options]="sortOptions"
           [(ngModel)]="sortKey"
           placeholder="Sort By Starting Bid"
           (onChange)="onSortChange($event)"
         />
         <p-select
-          [showClear]="true"
           [options]="sortOptionsMileage"
           [(ngModel)]="sortKey"
           placeholder="Sort By Mileage"
+          (onChange)="onSortChange($event)"
+        />
+        <p-select
+          [options]="sortOptionsMake"
+          [(ngModel)]="sortKey"
+          placeholder="Sort By Make"
+          (onChange)="onSortChange($event)"
+        />
+        <p-select
+          [options]="sortOptionsAuctionDate"
+          [(ngModel)]="sortKey"
+          placeholder="Sort By Auction Date"
           (onChange)="onSortChange($event)"
         />
         <p-button
@@ -39,6 +49,7 @@
             <div class="vehicle-information">
               {{ vehicle.make }}
               {{ vehicle.model }}
+              <span>Auction Date: {{ vehicle.auctionDateTime }}</span>
               <span
                 >Time until Auction Date:
                 {{ getTimeUntilAuction(vehicle.auctionDateTime) }}</span
@@ -59,7 +70,11 @@
                 "
                 (click)="toggleFavourite(vehicle.id)"
               ></p-button>
-              <p-button icon="pi pi-search-plus" label="More Details" />
+              <p-button
+                icon="pi pi-search-plus"
+                label="More Details"
+                (click)="goToDetails(vehicle.id)"
+              />
             </div>
           </div>
         </div>
@@ -97,7 +112,6 @@
         min="5000"
         [range]="true"
       />
-
       <div class="slider-labels">
         <span>{{ rangeValues[0] }} €</span>
         <span>{{ rangeValues[1] }} €</span>
@@ -111,6 +125,7 @@
           [raised]="true"
           variant="outlined"
           size="small"
+          (click)="applyFilters()"
         ></p-button>
         <p-button
           icon="pi pi-times"
@@ -118,6 +133,7 @@
           severity="secondary"
           size="small"
           variant="text"
+          (click)="clearFilters()"
         ></p-button>
       </div>
     </ng-template>

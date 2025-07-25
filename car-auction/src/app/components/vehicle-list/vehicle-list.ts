@@ -12,6 +12,8 @@ import { DrawerModule } from 'primeng/drawer';
 import { SelectButtonModule } from 'primeng/selectbutton';
 import { MultiSelectModule } from 'primeng/multiselect';
 import { SliderModule } from 'primeng/slider';
+import { InputTextModule } from 'primeng/inputtext';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-vehicle-list',
@@ -25,6 +27,7 @@ import { SliderModule } from 'primeng/slider';
     SelectButtonModule,
     MultiSelectModule,
     SliderModule,
+    InputTextModule,
   ],
   templateUrl: './vehicle-list.html',
   styleUrl: './vehicle-list.css',
@@ -34,12 +37,14 @@ export class VehicleList implements OnInit {
   vehicles$!: Observable<IVehicle[]>;
   sortOptions!: SelectItem[];
   sortOptionsMileage!: SelectItem[];
+  sortOptionsMake!: SelectItem[];
+  sortOptionsAuctionDate!: SelectItem[];
   sortKey!: SelectItem;
   sortOrder: number | null = null;
   sortField: string | undefined = undefined;
   isFavouriteFilter: boolean = false;
   showFilters: boolean = false;
-  value: string = 'off';
+  value: boolean | null = null;
   stateOptions: any[] = [
     { label: 'Favourite', value: true },
     { label: 'Not Favourite', value: false },
@@ -49,7 +54,7 @@ export class VehicleList implements OnInit {
   selectedModel: string[] = [];
   modelList: string[] = [];
   rangeValues: number[] = [5000, 50000];
-  constructor(public vehicleService: VehicleService) {}
+  constructor(public vehicleService: VehicleService, private router: Router) {}
 
   ngOnInit(): void {
     this.vehicles$ = this.vehicleService.vehicles$;
@@ -59,7 +64,15 @@ export class VehicleList implements OnInit {
     ];
     this.sortOptionsMileage = [
       { label: 'Mileage High to Low', value: '!mileage' },
-      { label: 'Mileage Bid Low to High', value: 'mileage' },
+      { label: 'Mileage Low to High', value: 'mileage' },
+    ];
+    this.sortOptionsMake = [
+      { label: 'Make A-Z', value: 'make' },
+      { label: 'Make Z-A', value: '!make' },
+    ];
+    this.sortOptionsAuctionDate = [
+      { label: 'Auction Date Newest First', value: '!auctionDateTime' },
+      { label: 'Auction Date Oldest First', value: 'auctionDateTime' },
     ];
     this.vehicleService.getUniqueMakes().subscribe((result: string[]) => {
       this.makeList = result;
@@ -96,11 +109,6 @@ export class VehicleList implements OnInit {
 
   onSortChange(event: any) {
     let value = event.value;
-    if (!value) {
-      this.sortField = undefined;
-      this.sortOrder = null;
-      return;
-    }
     if (value.indexOf('!') === 0) {
       this.sortOrder = -1;
       this.sortField = value.substring(1, value.length);
@@ -108,5 +116,27 @@ export class VehicleList implements OnInit {
       this.sortOrder = 1;
       this.sortField = value;
     }
+  }
+
+  applyFilters() {
+    this.vehicles$ = this.vehicleService.applyFilters(
+      this.selectedMake,
+      this.selectedModel,
+      this.value,
+      this.rangeValues
+    );
+    this.showFilters = false;
+  }
+  clearFilters() {
+    this.selectedMake = [];
+    this.selectedModel = [];
+    this.value = null;
+    this.rangeValues = [5000, 50000];
+    this.vehicles$ = this.vehicleService.vehicles$;
+    this.showFilters = false;
+  }
+
+  goToDetails(vehicleId: string): void {
+    this.router.navigate(['/vehicle', vehicleId]);
   }
 }
