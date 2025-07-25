@@ -5,10 +5,11 @@ import { VehicleService } from '../../services/vehicle-service';
 import { GalleriaModule } from 'primeng/galleria';
 import { CardModule } from 'primeng/card';
 import { DividerModule } from 'primeng/divider';
+import { AccordionModule } from 'primeng/accordion';
 
 @Component({
   selector: 'app-vehicle-detail',
-  imports: [GalleriaModule, CardModule, DividerModule],
+  imports: [GalleriaModule, CardModule, DividerModule, AccordionModule],
   templateUrl: './vehicle-detail.html',
   styleUrl: './vehicle-detail.css',
 })
