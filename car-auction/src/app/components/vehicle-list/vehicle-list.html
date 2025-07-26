@@ -1,126 +1,122 @@
-<div *ngIf="vehicles$ | async as vehicles">
-  <p-dataview
-    [value]="vehicles"
-    [rows]="5"
-    [paginator]="true"
-    showCurrentPageReport="true"
-    [rowsPerPageOptions]="rowsOptions"
-  >
-    <ng-template #header>
-      <p-button
-        icon="pi pi-filter"
-        label="Filters and Sorting"
-        (onClick)="showFilters = true"
-      />
-    </ng-template>
-    <ng-template #list let-vehicles>
-      <div class="grid grid-cols-12 gap-4 grid-nogutter">
-        <div *ngFor="let vehicle of vehicles">
-          <div class="vehicle-div">
-            <img class="rounded-image" src="assets/blue_car.jpg" width="200" />
-            <div class="vehicle-information">
-              <span style="font-weight: bolder"
-                >{{ vehicle.make }} {{ vehicle.model }}</span
-              >
-              <span>
-                {{ formatNumberToSpecificLocale(vehicle.mileage) }} Km</span
-              >
-              <span
-                >Starting Bid:
-                {{ formatNumberToSpecificLocale(vehicle.startingBid) }} €</span
-              >
-            </div>
-            <div class="vehicle-information">
-              <span
-                ><span style="font-weight: bolder">Auction Date: </span
-                >{{ vehicle.auctionDateTime }}</span
-              >
-              <span
-                ><span style="font-weight: bolder"
-                  >Time until Auction Date:
-                </span>
-                {{ getTimeUntilAuction(vehicle.auctionDateTime) }}</span
-              >
-            </div>
-            <div class="buttons-div">
-              <p-button
-                icon="
+<p-dataview
+  [value]="vehicleService.vehicles()"
+  [rows]="5"
+  [paginator]="true"
+  showCurrentPageReport="true"
+  [rowsPerPageOptions]="rowsOptions"
+>
+  <ng-template #header>
+    <p-button
+      icon="pi pi-filter"
+      label="Filters and Sorting"
+      (onClick)="showFilters = true"
+    />
+  </ng-template>
+  <ng-template #list let-vehicles>
+    <div class="grid grid-cols-12 gap-4 grid-nogutter">
+      <div *ngFor="let vehicle of vehicles">
+        <div class="vehicle-div">
+          <img class="rounded-image" src="assets/blue_car.jpg" width="200" />
+          <div class="vehicle-information">
+            <span style="font-weight: bolder"
+              >{{ vehicle.make }} {{ vehicle.model }}</span
+            >
+            <span> {{ formatNumberToSpecificLocale(vehicle.mileage) }} Km</span>
+            <span
+              >Starting Bid:
+              {{ formatNumberToSpecificLocale(vehicle.startingBid) }} €</span
+            >
+          </div>
+          <div class="vehicle-information">
+            <span
+              ><span style="font-weight: bolder">Auction Date: </span
+              >{{ vehicle.auctionDateTime }}</span
+            >
+            <span
+              ><span style="font-weight: bolder"
+                >Time until Auction Date:
+              </span>
+              {{ getTimeUntilAuction(vehicle.auctionDateTime) }}</span
+            >
+          </div>
+          <div class="buttons-div">
+            <p-button
+              icon="
                   {{ vehicle.favourite ? 'pi pi-heart-fill' : 'pi pi-heart' }}
                 "
-                (click)="toggleFavourite(vehicle.id)"
-              ></p-button>
-              <p-button
-                icon="pi pi-search-plus"
-                label="More Details"
-                (click)="goToDetails(vehicle.id)"
-              />
-            </div>
+              (click)="toggleFavourite(vehicle.id)"
+            ></p-button>
+            <p-button
+              icon="pi pi-search-plus"
+              label="More Details"
+              [routerLink]="['/vehicle', vehicle.id]"
+            />
           </div>
         </div>
       </div>
-    </ng-template>
-  </p-dataview>
-  <p-drawer [(visible)]="showFilters" header="Filters and Sorting">
-    <div class="filters-drawer">
-      <p-multiselect
-        [options]="makeList"
-        [(ngModel)]="selectedMake"
-        placeholder="Select Make"
-        [maxSelectedLabels]="3"
-        (onChange)="onChangeMake()"
-      />
-      <p-multiselect
-        [options]="modelList"
-        [(ngModel)]="selectedModel"
-        placeholder="Select Model"
-        [maxSelectedLabels]="3"
-        [disabled]="!selectedMake || selectedMake.length === 0"
-      />
-      <p-selectbutton
-        [options]="stateOptions"
-        [(ngModel)]="value"
-        optionLabel="label"
-        optionValue="value"
-        aria-labelledby="basic"
-      />
-      <span>Starting Bid Range</span>
-      <p-slider
-        [(ngModel)]="rangeValues"
-        [step]="1000"
-        max="50000"
-        min="5000"
-        [range]="true"
-      />
-      <div class="slider-labels">
-        <span>{{ rangeValues[0] }} €</span>
-        <span>{{ rangeValues[1] }} €</span>
-      </div>
-      <p-select
-        [options]="sortOptions"
-        [(ngModel)]="selectedSort"
-        optionLabel="label"
-        placeholder="Sort Vehicles"
-      />
     </div>
-    <ng-template #footer>
-      <div class="buttons-footer">
-        <p-button
-          icon="pi pi-search"
-          label="Show Vehicles"
-          [raised]="true"
-          variant="outlined"
-          size="small"
-          (click)="updateVehicles()"
-        />
-        <p-button
-          icon="pi pi-times"
-          label="Clear Filters"
-          severity="secondary"
-          size="small"
-          variant="text"
-          (click)="clearFilters()"
-        ></p-button>
-      </div>
-    </ng-template>
-  </p-drawer>
-</div>
+  </ng-template>
+</p-dataview>
+<p-drawer [(visible)]="showFilters" header="Filters and Sorting">
+  <div class="filters-drawer">
+    <p-multiselect
+      [options]="this.vehicleService.getUniqueMakes()"
+      [(ngModel)]="selectedMake"
+      placeholder="Select Make"
+      [maxSelectedLabels]="3"
+      (onChange)="onChangeMake()"
+    />
+    <p-multiselect
+      [options]="modelList"
+      [(ngModel)]="selectedModel"
+      placeholder="Select Model"
+      [maxSelectedLabels]="3"
+      [disabled]="!selectedMake || selectedMake.length === 0"
+    />
+    <p-selectbutton
+      [options]="stateOptions"
+      [(ngModel)]="value"
+      optionLabel="label"
+      optionValue="value"
+      aria-labelledby="basic"
+    />
+    <span>Starting Bid Range</span>
+    <p-slider
+      [(ngModel)]="rangeValues"
+      [step]="1000"
+      max="50000"
+      min="5000"
+      [range]="true"
+    />
+    <div class="slider-labels">
+      <span>{{ rangeValues[0] }} €</span>
+      <span>{{ rangeValues[1] }} €</span>
+    </div>
+    <p-select
+      [options]="sortOptions"
+      [(ngModel)]="selectedSort"
+      optionLabel="label"
+      placeholder="Sort Vehicles"
+    />
+  </div>
+  <ng-template #footer>
+    <div class="buttons-footer">
+      <p-button
+        icon="pi pi-search"
+        label="Show Vehicles"
+        [raised]="true"
+        variant="outlined"
+        size="small"
+        (click)="updateVehicles()"
+      />
+      <p-button
+        icon="pi pi-times"
+        label="Clear Filters"
+        severity="secondary"
+        size="small"
+        variant="text"
+        (click)="clearFilters()"
+      ></p-button>
+    </div>
+  </ng-template>
+</p-drawer>

@@ -1,5 +1,4 @@
-import { Injectable } from '@angular/core';
-import { BehaviorSubject, map, Observable, of } from 'rxjs';
+import { Injectable, signal } from '@angular/core';
 import { IVehicle } from '../models/IVehicle';
 import { HttpClient } from '@angular/common/http';
 
@@ -7,8 +6,10 @@ import { HttpClient } from '@angular/common/http';
   providedIn: 'root',
 })
 export class VehicleService {
-  private vehiclesSubject = new BehaviorSubject<IVehicle[]>([]);
-  vehicles$ = this.vehiclesSubject.asObservable();
+  // Original data, only altered when favourite vehicles
+  private originalVehicles = signal<IVehicle[]>([]);
+  // Filter and sort
+  public vehicles = signal<IVehicle[]>([]);
 
   constructor(private http: HttpClient) {
     this.loadVehiclesFromJson();
@@ -22,41 +23,46 @@ export class VehicleService {
           ...vehicle,
           id: index + 1,
         }));
-        this.vehiclesSubject.next(withIds);
+        this.vehicles.set(withIds);
+        this.originalVehicles.set(withIds);
       });
   }
 
   toggleFavourite(id: number) {
-    const current = this.vehiclesSubject.getValue();
-    const updated = current.map((vehicle) =>
+    const updated = this.vehicles().map((vehicle) =>
       vehicle.id === id
         ? { ...vehicle, favourite: !vehicle.favourite }
         : vehicle
     );
-    this.vehiclesSubject.next(updated);
+    this.vehicles.set(updated);
+    const updatedOriginal = this.originalVehicles().map((vehicle) =>
+      vehicle.id === id
+        ? { ...vehicle, favourite: !vehicle.favourite }
+        : vehicle
+    );
+    this.originalVehicles.set(updatedOriginal);
   }
 
   getVehicleById(id: number): IVehicle | undefined {
-    return this.vehiclesSubject.getValue().find((v) => v.id === id);
+    return this.originalVehicles().find((v) => v.id === id);
   }
 
-  getUniqueMakes(): Observable<string[]> {
-    return this.vehicles$.pipe(
-      map((vehicles: any) =>
-        Array.from(new Set(vehicles.map((vehicle: IVehicle) => vehicle.make)))
+  getUniqueMakes(): string[] {
+    return Array.from(new Set(this.originalVehicles().map((v) => v.make)));
+  }
+
+  getUniqueModels(selectedMakes: string[]): string[] {
+    return Array.from(
+      new Set(
+        this.originalVehicles()
+          .filter((v) => selectedMakes.includes(v.make))
+          .map((v) => v.model)
       )
     );
   }
 
-  getUniqueModels(selectedMakes: string[]): Observable<string[]> {
-    return this.vehicles$.pipe(
-      map((vehicles: IVehicle[]) =>
-        vehicles
-          .filter((vehicle) => selectedMakes.includes(vehicle.make))
-          .map((vehicle) => vehicle.model)
-      ),
-      map((models) => Array.from(new Set(models)))
-    );
+  resetFilters() {
+    this.vehicles.set(this.originalVehicles());
   }
 
   getFilteredAndSortedVehicles(
@@ -65,29 +71,23 @@ export class VehicleService {
     isFavourite: boolean | null,
     rangeValues: number[],
     sortOption: SortOption | null
-  ): Observable<IVehicle[]> {
-    return this.vehicles$.pipe(
-      map((vehicles) => {
-        const filtered = this.filterVehicles(
-          vehicles,
-          selectedMakes,
-          selectedModels,
-          isFavourite,
-          rangeValues
-        );
-        return this.sortVehicles(filtered, sortOption);
-      })
+  ) {
+    const filtered = this.filterVehicles(
+      selectedMakes,
+      selectedModels,
+      isFavourite,
+      rangeValues
     );
+    this.vehicles.set(this.sortVehicles(filtered, sortOption));
   }
 
   private filterVehicles(
-    vehicles: IVehicle[],
     selectedMakes: string[],
     selectedModels: string[],
     isFavourite: boolean | null,
     rangeValues: number[]
   ): IVehicle[] {
-    return vehicles.filter((vehicle) => {
+    return this.originalVehicles().filter((vehicle) => {
       const matchesMake =
         selectedMakes.length === 0 || selectedMakes.includes(vehicle.make);
 

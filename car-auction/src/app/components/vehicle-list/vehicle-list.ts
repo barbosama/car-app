@@ -1,19 +1,16 @@
-import { Component, OnInit } from '@angular/core';
-import { Observable } from 'rxjs';
-import { IVehicle } from '../../models/IVehicle';
+import { Component } from '@angular/core';
 import { VehicleService } from '../../services/vehicle-service';
 import { CommonModule } from '@angular/common';
 import { DataViewModule } from 'primeng/dataview';
 import { ButtonModule } from 'primeng/button';
 import { SelectModule } from 'primeng/select';
-import { SelectItem } from 'primeng/api';
 import { FormsModule } from '@angular/forms';
 import { DrawerModule } from 'primeng/drawer';
 import { SelectButtonModule } from 'primeng/selectbutton';
 import { MultiSelectModule } from 'primeng/multiselect';
 import { SliderModule } from 'primeng/slider';
 import { InputTextModule } from 'primeng/inputtext';
-import { Router } from '@angular/router';
+import { RouterModule } from '@angular/router';
 
 @Component({
   selector: 'app-vehicle-list',
@@ -28,13 +25,13 @@ import { Router } from '@angular/router';
     MultiSelectModule,
     SliderModule,
     InputTextModule,
+    RouterModule,
   ],
   templateUrl: './vehicle-list.html',
   styleUrl: './vehicle-list.css',
 })
-export class VehicleList implements OnInit {
+export class VehicleList {
   rowsOptions: number[] = [5, 10, 15, 20];
-  vehicles$!: Observable<IVehicle[]>;
   isFavouriteFilter: boolean = false;
   showFilters: boolean = false;
   value: boolean | null = null;
@@ -43,7 +40,6 @@ export class VehicleList implements OnInit {
     { label: 'Not Favourite', value: false },
   ];
   selectedMake: string[] = [];
-  makeList: string[] = [];
   selectedModel: string[] = [];
   modelList: string[] = [];
   rangeValues: number[] = [5000, 50000];
@@ -78,25 +74,14 @@ export class VehicleList implements OnInit {
 
   selectedSort: SortOption | null = null;
 
-  constructor(public vehicleService: VehicleService, private router: Router) {}
-
-  ngOnInit(): void {
-    this.vehicles$ = this.vehicleService.vehicles$;
-    this.vehicleService.getUniqueMakes().subscribe((result: string[]) => {
-      this.makeList = result;
-    });
-  }
+  constructor(public vehicleService: VehicleService) {}
 
   onChangeMake() {
+    this.selectedModel = [];
     if (this.selectedMake && this.selectedMake.length > 0) {
-      this.vehicleService
-        .getUniqueModels(this.selectedMake)
-        .subscribe((result: string[]) => {
-          this.modelList = result;
-        });
+      this.modelList = this.vehicleService.getUniqueModels(this.selectedMake);
     } else {
       this.modelList = [];
-      this.selectedModel = [];
     }
   }
 
@@ -122,7 +107,7 @@ export class VehicleList implements OnInit {
   }
 
   updateVehicles() {
-    this.vehicles$ = this.vehicleService.getFilteredAndSortedVehicles(
+    this.vehicleService.getFilteredAndSortedVehicles(
       this.selectedMake,
       this.selectedModel,
       this.value,
@@ -138,11 +123,7 @@ export class VehicleList implements OnInit {
     this.value = null;
     this.rangeValues = [5000, 50000];
     this.selectedSort = null;
-    this.vehicles$ = this.vehicleService.vehicles$;
+    this.vehicleService.resetFilters();
     this.showFilters = false;
-  }
-
-  goToDetails(vehicleId: string): void {
-    this.router.navigate(['/vehicle', vehicleId]);
   }
 }
