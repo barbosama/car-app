@@ -6,10 +6,19 @@ import { GalleriaModule } from 'primeng/galleria';
 import { CardModule } from 'primeng/card';
 import { DividerModule } from 'primeng/divider';
 import { AccordionModule } from 'primeng/accordion';
+import { ButtonModule } from 'primeng/button';
+import { RouterModule } from '@angular/router';
 
 @Component({
   selector: 'app-vehicle-detail',
-  imports: [GalleriaModule, CardModule, DividerModule, AccordionModule],
+  imports: [
+    GalleriaModule,
+    CardModule,
+    DividerModule,
+    AccordionModule,
+    ButtonModule,
+    RouterModule,
+  ],
   templateUrl: './vehicle-detail.html',
   styleUrl: './vehicle-detail.css',
 })

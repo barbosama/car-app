@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, map, Observable } from 'rxjs';
+import { BehaviorSubject, map, Observable, of } from 'rxjs';
 import { IVehicle } from '../models/IVehicle';
 import { HttpClient } from '@angular/common/http';
 
@@ -59,32 +59,70 @@ export class VehicleService {
     );
   }
 
-  applyFilters(
+  getFilteredAndSortedVehicles(
+    selectedMakes: string[],
+    selectedModels: string[],
+    isFavourite: boolean | null,
+    rangeValues: number[],
+    sortOption: SortOption | null
+  ): Observable<IVehicle[]> {
+    return this.vehicles$.pipe(
+      map((vehicles) => {
+        const filtered = this.filterVehicles(
+          vehicles,
+          selectedMakes,
+          selectedModels,
+          isFavourite,
+          rangeValues
+        );
+        return this.sortVehicles(filtered, sortOption);
+      })
+    );
+  }
+
+  private filterVehicles(
+    vehicles: IVehicle[],
     selectedMakes: string[],
     selectedModels: string[],
     isFavourite: boolean | null,
     rangeValues: number[]
-  ): Observable<IVehicle[]> {
-    return this.vehicles$.pipe(
-      map((vehicles) =>
-        vehicles.filter((vehicle) => {
-          const matchesMake =
-            selectedMakes.length === 0 || selectedMakes.includes(vehicle.make);
+  ): IVehicle[] {
+    return vehicles.filter((vehicle) => {
+      const matchesMake =
+        selectedMakes.length === 0 || selectedMakes.includes(vehicle.make);
 
-          const matchesModel =
-            selectedModels.length === 0 ||
-            selectedModels.includes(vehicle.model);
+      const matchesModel =
+        selectedModels.length === 0 || selectedModels.includes(vehicle.model);
 
-          const matchesFavourite =
-            isFavourite === null || vehicle.favourite === isFavourite;
+      const matchesFavourite =
+        isFavourite === null || vehicle.favourite === isFavourite;
 
-          const matchesBid =
-            vehicle.startingBid >= rangeValues[0] &&
-            vehicle.startingBid <= rangeValues[1];
+      const matchesBid =
+        vehicle.startingBid >= rangeValues[0] &&
+        vehicle.startingBid <= rangeValues[1];
 
-          return matchesMake && matchesModel && matchesFavourite && matchesBid;
-        })
-      )
-    );
+      return matchesMake && matchesModel && matchesFavourite && matchesBid;
+    });
+  }
+
+  private sortVehicles(
+    vehicles: IVehicle[],
+    sortOption: SortOption | null
+  ): IVehicle[] {
+    if (!sortOption) return vehicles;
+
+    const field = sortOption.value.field;
+    const direction = sortOption.value.direction;
+
+    return [...vehicles].sort((a, b) => {
+      const fieldA = a[field];
+      const fieldB = b[field];
+      // no value the order stays the same
+      if (fieldA == null || fieldB == null) return 0;
+      // -1 indicates that A comes before B
+      if (fieldA < fieldB) return direction === 'asc' ? -1 : 1;
+      if (fieldA > fieldB) return direction === 'asc' ? 1 : -1;
+      return 0;
+    });
   }
 }

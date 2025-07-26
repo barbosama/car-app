@@ -1,4 +1,10 @@
-<p-card *ngIf="vehicle" header="Vehicle Details">
+<p-button
+  icon="pi pi-chevron-left"
+  routerLink="/"
+  label="Back to Vehicle List"
+/>
+@if (vehicle) {
+<p-card header="Vehicle Details">
   <p-galleria
     [value]="images"
     [responsiveOptions]="responsiveOptions"
@@ -130,4 +136,6 @@
     </p-accordion-panel>
   </p-accordion>
 </p-card>
-<p-card *ngIf="vehicle === undefined"> Error loading details page </p-card>
+} @else {
+<p-card> Error loading details page </p-card>
+}

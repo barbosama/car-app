@@ -1,34 +1,14 @@
 import { Component, OnInit, signal } from '@angular/core';
-import { Router, RouterOutlet } from '@angular/router';
-import { MenuItem } from 'primeng/api';
-import { MenubarModule } from 'primeng/menubar';
-import { ButtonModule } from 'primeng/button';
+import { RouterOutlet } from '@angular/router';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, MenubarModule, ButtonModule],
+  imports: [RouterOutlet],
   templateUrl: './app.html',
   styleUrl: './app.css',
 })
 export class App implements OnInit {
-  items: MenuItem[] | undefined;
-
   protected readonly title = signal('car-auction');
-  constructor(private router: Router) {}
-  ngOnInit() {
-    this.items = [
-      {
-        label: 'Home',
-        command: () => {
-          this.router.navigate(['/']);
-        },
-      },
-      {
-        label: 'List of Cars',
-        command: () => {
-          this.router.navigate(['/car-list']);
-        },
-      },
-    ];
-  }
+  constructor() {}
+  ngOnInit() {}
 }

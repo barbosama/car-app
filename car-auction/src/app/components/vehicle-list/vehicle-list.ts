@@ -35,13 +35,6 @@ import { Router } from '@angular/router';
 export class VehicleList implements OnInit {
   rowsOptions: number[] = [5, 10, 15, 20];
   vehicles$!: Observable<IVehicle[]>;
-  sortOptions!: SelectItem[];
-  sortOptionsMileage!: SelectItem[];
-  sortOptionsMake!: SelectItem[];
-  sortOptionsAuctionDate!: SelectItem[];
-  sortKey!: SelectItem;
-  sortOrder: number | null = null;
-  sortField: string | undefined = undefined;
   isFavouriteFilter: boolean = false;
   showFilters: boolean = false;
   value: boolean | null = null;
@@ -54,26 +47,41 @@ export class VehicleList implements OnInit {
   selectedModel: string[] = [];
   modelList: string[] = [];
   rangeValues: number[] = [5000, 50000];
+  sortOptions: SortOption[] = [
+    { label: 'Make (A-Z)', value: { field: 'make', direction: 'asc' } },
+    { label: 'Make (Z-A)', value: { field: 'make', direction: 'desc' } },
+    {
+      label: 'Starting Bid (Low to High)',
+      value: { field: 'startingBid', direction: 'asc' },
+    },
+    {
+      label: 'Starting Bid (High to Low)',
+      value: { field: 'startingBid', direction: 'desc' },
+    },
+    {
+      label: 'Mileage (Low to High)',
+      value: { field: 'mileage', direction: 'asc' },
+    },
+    {
+      label: 'Mileage (High to Low)',
+      value: { field: 'mileage', direction: 'desc' },
+    },
+    {
+      label: 'Auction Date (Earliest First)',
+      value: { field: 'auctionDateTime', direction: 'asc' },
+    },
+    {
+      label: 'Auction Date (Latest First)',
+      value: { field: 'auctionDateTime', direction: 'desc' },
+    },
+  ];
+
+  selectedSort: SortOption | null = null;
+
   constructor(public vehicleService: VehicleService, private router: Router) {}
 
   ngOnInit(): void {
     this.vehicles$ = this.vehicleService.vehicles$;
-    this.sortOptions = [
-      { label: 'Starting Bid High to Low', value: '!startingBid' },
-      { label: 'Starting Bid Low to High', value: 'startingBid' },
-    ];
-    this.sortOptionsMileage = [
-      { label: 'Mileage High to Low', value: '!mileage' },
-      { label: 'Mileage Low to High', value: 'mileage' },
-    ];
-    this.sortOptionsMake = [
-      { label: 'Make A-Z', value: 'make' },
-      { label: 'Make Z-A', value: '!make' },
-    ];
-    this.sortOptionsAuctionDate = [
-      { label: 'Auction Date Newest First', value: '!auctionDateTime' },
-      { label: 'Auction Date Oldest First', value: 'auctionDateTime' },
-    ];
     this.vehicleService.getUniqueMakes().subscribe((result: string[]) => {
       this.makeList = result;
     });
@@ -98,40 +106,38 @@ export class VehicleList implements OnInit {
 
   getTimeUntilAuction(date: string): string {
     const diff = new Date(date).getTime() - new Date().getTime();
-    const hours = Math.floor(diff / (1000 * 60 * 60));
-    const days = Math.floor(hours / 24);
-    return `${days} days ${hours % 24} hours`;
+
+    if (diff <= 0) return 'Auction started';
+
+    const totalMinutes = Math.floor(diff / (1000 * 60));
+    const days = Math.floor(totalMinutes / (60 * 24));
+    const hours = Math.floor((totalMinutes % (60 * 24)) / 60);
+    const minutes = totalMinutes % 60;
+
+    return `${days} days ${hours} hours ${minutes} minutes`;
   }
 
   formatNumberToSpecificLocale(value: number): string {
     return value.toLocaleString('pt-PT');
   }
 
-  onSortChange(event: any) {
-    let value = event.value;
-    if (value.indexOf('!') === 0) {
-      this.sortOrder = -1;
-      this.sortField = value.substring(1, value.length);
-    } else {
-      this.sortOrder = 1;
-      this.sortField = value;
-    }
-  }
-
-  applyFilters() {
-    this.vehicles$ = this.vehicleService.applyFilters(
+  updateVehicles() {
+    this.vehicles$ = this.vehicleService.getFilteredAndSortedVehicles(
       this.selectedMake,
       this.selectedModel,
       this.value,
-      this.rangeValues
+      this.rangeValues,
+      this.selectedSort
     );
     this.showFilters = false;
   }
+
   clearFilters() {
     this.selectedMake = [];
     this.selectedModel = [];
     this.value = null;
     this.rangeValues = [5000, 50000];
+    this.selectedSort = null;
     this.vehicles$ = this.vehicleService.vehicles$;
     this.showFilters = false;
   }
