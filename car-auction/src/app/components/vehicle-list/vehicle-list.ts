@@ -89,8 +89,8 @@ export class VehicleList {
     this.vehicleService.toggleFavourite(id);
   }
 
-  getTimeUntilAuction(date: string): string {
-    const diff = new Date(date).getTime() - new Date().getTime();
+  getTimeUntilAuction(date: string, currentDate: Date = new Date()): string {
+    const diff = new Date(date).getTime() - currentDate.getTime();
 
     if (diff <= 0) return 'Auction started';
 

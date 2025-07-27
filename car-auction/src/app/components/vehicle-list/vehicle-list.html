@@ -13,52 +13,54 @@
     />
   </ng-template>
   <ng-template #list let-vehicles>
-    <div class="grid grid-cols-12 gap-4 grid-nogutter">
-      <div *ngFor="let vehicle of vehicles">
-        <div class="vehicle-div">
-          <img class="rounded-image" src="assets/blue_car.jpg" width="200" />
-          <div class="vehicle-information">
-            <span style="font-weight: bolder"
-              >{{ vehicle.make }} {{ vehicle.model }}</span
-            >
-            <span> {{ formatNumberToSpecificLocale(vehicle.mileage) }} Km</span>
-            <span
-              >Starting Bid:
-              {{ formatNumberToSpecificLocale(vehicle.startingBid) }} €</span
-            >
-          </div>
-          <div class="vehicle-information">
-            <span
-              ><span style="font-weight: bolder">Auction Date: </span
-              >{{ vehicle.auctionDateTime }}</span
-            >
-            <span
-              ><span style="font-weight: bolder"
-                >Time until Auction Date:
-              </span>
-              {{ getTimeUntilAuction(vehicle.auctionDateTime) }}</span
-            >
-          </div>
-          <div class="buttons-div">
-            <p-button
-              icon="
+    <div *ngFor="let vehicle of vehicles">
+      <div
+        class="flex justify-content-between align-items-center m-2 p-2 border-bottom-1 border-gray-500"
+      >
+        <img
+          class="border-round object-cover"
+          src="assets/blue_car.jpg"
+          width="200"
+        />
+        <div class="flex flex-column justify-content-around">
+          <span style="font-weight: bolder"
+            >{{ vehicle.make }} {{ vehicle.model }}</span
+          >
+          <span> {{ formatNumberToSpecificLocale(vehicle.mileage) }} Km</span>
+          <span
+            >Starting Bid:
+            {{ formatNumberToSpecificLocale(vehicle.startingBid) }} €</span
+          >
+        </div>
+        <div class="flex flex-column justify-content-around">
+          <span
+            ><span style="font-weight: bolder">Auction Date: </span
+            >{{ vehicle.auctionDateTime }}</span
+          >
+          <span
+            ><span style="font-weight: bolder">Time until Auction Date: </span>
+            {{ getTimeUntilAuction(vehicle.auctionDateTime) }}</span
+          >
+        </div>
+        <div class="flex flex-row gap-5">
+          <p-button
+            icon="
                   {{ vehicle.favourite ? 'pi pi-heart-fill' : 'pi pi-heart' }}
                 "
-              (click)="toggleFavourite(vehicle.id)"
-            ></p-button>
-            <p-button
-              icon="pi pi-search-plus"
-              label="More Details"
-              [routerLink]="['/vehicle', vehicle.id]"
-            />
-          </div>
+            (click)="toggleFavourite(vehicle.id)"
+          ></p-button>
+          <p-button
+            icon="pi pi-search-plus"
+            label="More Details"
+            [routerLink]="['/vehicle', vehicle.id]"
+          />
         </div>
       </div>
     </div>
   </ng-template>
 </p-dataview>
 <p-drawer [(visible)]="showFilters" header="Filters and Sorting">
-  <div class="filters-drawer">
+  <div class="flex flex-column gap-4">
     <p-multiselect
       [options]="this.vehicleService.getUniqueMakes()"
       [(ngModel)]="selectedMake"
@@ -88,7 +90,7 @@
       min="5000"
       [range]="true"
     />
-    <div class="slider-labels">
+    <div class="flex justify-content-between mt-1 font-bold">
       <span>{{ rangeValues[0] }} €</span>
       <span>{{ rangeValues[1] }} €</span>
     </div>
@@ -100,7 +102,7 @@
     />
   </div>
   <ng-template #footer>
-    <div class="buttons-footer">
+    <div class="flex flex-row gap-2">
       <p-button
         icon="pi pi-search"
         label="Show Vehicles"

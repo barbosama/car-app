@@ -38,23 +38,23 @@
   </p-galleria>
   <p-divider></p-divider>
   <h1>{{ vehicle.make }} {{ vehicle.model }}</h1>
-  <div class="icon-div">
-    <div class="icon-item">
+  <div class="flex flex-row gap-6">
+    <div class="flex flex-column gap-3 align-items-center">
       <i class="pi pi-wrench" style="font-size: 2rem"></i>
       <span>Engine Size</span>
       {{ vehicle.engineSize }}
     </div>
-    <div class="icon-item">
+    <div class="flex flex-column gap-3 align-items-center">
       <i class="pi pi-calendar" style="font-size: 2rem"></i>
       <span>Year</span>
       {{ vehicle.year }}
     </div>
-    <div class="icon-item">
+    <div class="flex flex-column gap-3 align-items-center">
       <i class="pi pi-gauge" style="font-size: 2rem"></i>
       <span>Mileage </span>
       <span>{{ vehicle.mileage }} Km</span>
     </div>
-    <div class="icon-item">
+    <div class="flex flex-column gap-3 align-items-center">
       <i class="pi pi-euro" style="font-size: 2rem"></i>
       <span>Starting Bid </span>
       <span>{{ vehicle.startingBid }}</span>
@@ -65,36 +65,52 @@
     <p-accordion-panel value="0">
       <p-accordion-header>Specifications</p-accordion-header>
       <p-accordion-content>
-        <div class="specification-div">
-          <span class="title-span">Vehicle Type</span>
+        <div
+          class="flex justify-content-between border-bottom surface-border p-2 w-30rem"
+        >
+          <span class="font-bold text-gray-500">Vehicle Type</span>
           <span>{{ vehicle.details.specification.vehicleType }}</span>
         </div>
-        <div class="specification-div">
-          <span class="title-span">Colour</span>
+        <div
+          class="flex justify-content-between border-bottom surface-border p-2 w-30rem"
+        >
+          <span class="font-bold text-gray-500">Colour</span>
           <span>{{ vehicle.details.specification.colour }}</span>
         </div>
-        <div class="specification-div">
-          <span class="title-span">Fuel</span>
+        <div
+          class="flex justify-content-between border-bottom surface-border p-2 w-30rem"
+        >
+          <span class="font-bold text-gray-500">Fuel</span>
           <span>{{ vehicle.details.specification.fuel }}</span>
         </div>
-        <div class="specification-div">
-          <span class="title-span">Transmission</span>
+        <div
+          class="flex justify-content-between border-bottom surface-border p-2 w-30rem"
+        >
+          <span class="font-bold text-gray-500">Transmission</span>
           <span>{{ vehicle.details.specification.transmission }}</span>
         </div>
-        <div class="specification-div">
-          <span class="title-span">Number of Doors</span>
+        <div
+          class="flex justify-content-between border-bottom surface-border p-2 w-30rem"
+        >
+          <span class="font-bold text-gray-500">Number of Doors</span>
           <span>{{ vehicle.details.specification.numberOfDoors }}</span>
         </div>
-        <div class="specification-div">
-          <span class="title-span">CO2 Emissions</span>
+        <div
+          class="flex justify-content-between border-bottom surface-border p-2 w-30rem"
+        >
+          <span class="font-bold text-gray-500">CO2 Emissions</span>
           <span>{{ vehicle.details.specification.co2Emissions }}</span>
         </div>
-        <div class="specification-div">
-          <span class="title-span">NOX Emissions</span>
+        <div
+          class="flex justify-content-between border-bottom surface-border p-2 w-30rem"
+        >
+          <span class="font-bold text-gray-500">NOX Emissions</span>
           <span>{{ vehicle.details.specification.noxEmissions }}</span>
         </div>
-        <div class="specification-div">
-          <span class="title-span">Number Of Keys</span>
+        <div
+          class="flex justify-content-between border-bottom surface-border p-2 w-30rem"
+        >
+          <span class="font-bold text-gray-500">Number Of Keys</span>
           <span>{{ vehicle.details.specification.numberOfKeys }}</span>
         </div>
       </p-accordion-content>
@@ -102,18 +118,18 @@
     <p-accordion-panel value="1">
       <p-accordion-header>Ownership</p-accordion-header>
       <p-accordion-content>
-        <div class="icon-div">
-          <div class="icon-item">
+        <div class="flex flex-row gap-6">
+          <div class="flex flex-column gap-3 align-items-center">
             <i class="pi pi-user" style="font-size: 2rem"></i>
             <span>Number of Owners</span>
             {{ vehicle.details.ownership.numberOfOwners }}
           </div>
-          <div class="icon-item">
+          <div class="flex flex-column gap-3 align-items-center">
             <i class="pi pi-book" style="font-size: 2rem"></i>
             <span>Log Book</span>
             {{ vehicle.details.ownership.logBook }}
           </div>
-          <div class="icon-item">
+          <div class="flex flex-column gap-3 align-items-center">
             <i class="pi pi-calendar" style="font-size: 2rem"></i>
             <span>Date of Registration </span>
             <span>{{ vehicle.details.ownership.dateOfRegistration }}</span>
