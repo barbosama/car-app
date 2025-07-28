@@ -91,7 +91,8 @@ describe('VehicleService', () => {
   });
 
   it('should load vehicles from JSON and set signals', (done) => {
-    // signals are async, so we wait a tick
+    // signals are async, so we wait a tick. Signals are reactive,
+    // but changes don't propagate synchronously on service init. This defers the check until Angular's change detection stabilizes
     setTimeout(() => {
       expect(service.vehicles()).toEqual(mockVehicles);
       expect(service.getVehicleById(1)?.make).toBe('Toyota');
@@ -146,7 +147,7 @@ describe('VehicleService', () => {
       service.getFilteredAndSortedVehicles(
         ['Toyota'], // selectedMakes
         [], // selectedModels
-        null, // isFavourite (any)
+        null, // isFavourite
         [0, 20000], // rangeValues for startingBid
         sortOptionDesc
       );
