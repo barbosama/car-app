@@ -46,8 +46,8 @@ export class VehicleDetail implements OnInit {
   ];
   responsiveOptions: any[] = [
     {
-      breakpoint: '1300px',
-      numVisible: 4,
+      breakpoint: '992px',
+      numVisible: 2,
     },
     {
       breakpoint: '575px',
